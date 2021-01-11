@@ -1,0 +1,39 @@
+import { Component, ChangeDetectorRef } from "@angular/core";
+import { ApexService } from "../service/apex.service";
+import { HttpService } from "../service/http.service";
+import { Storage } from "../utils/storage";
+@Component({
+  selector: "apex-log-count",
+  template: ` <div>{{ count }}</div> `,
+  styles: [""],
+})
+export class LogCountComponent {
+  showLoading: any;
+  count: number = 0;
+  intervalClear: any = null;
+  constructor(private apexService: ApexService, private http: HttpService) {
+    this.apexService.logCountEvent().subscribe((result: number) => {
+      console.log("resut:" + result);
+      if (this.intervalClear) clearInterval(this.intervalClear);
+
+      this.count = result;
+      this.intervalClear = setInterval(() => {
+        this.count++;
+        if (this.count == 3 * 1) {
+          if (Storage.getSessionUser()) {
+            let con = confirm("Do you want extendcontinue?");
+            if (con) {
+              this.count = 0;
+            } else {
+              // call hhtp
+            }
+          } else {
+            this.count = 0;
+          }
+        }
+        console.log(this.count);
+      }, 10000);
+    });
+    // this.cd.detectChanges();
+  }
+}
